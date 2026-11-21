@@ -1,79 +1,68 @@
-import api from './api';
-
-const data = (p) => p.then((r) => r.data);
+import { localApi } from './localStore';
 
 export const authService = {
-  me: () => data(api.get('/auth/me')),
-  login: (payload) => data(api.post('/auth/login', payload)),
-  register: (payload) => data(api.post('/auth/register', payload)),
-  logout: () => data(api.post('/auth/logout')),
-  changePassword: (payload) => data(api.put('/auth/password', payload)),
+  me: () => localApi.me(),
+  login: (payload) => localApi.login(payload),
+  register: (payload) => localApi.register(payload),
+  logout: () => localApi.logout(),
+  changePassword: (payload) => localApi.changePassword(payload),
 };
 
 export const programService = {
-  list: (params) => data(api.get('/programs', { params })),
-  get: (slugOrId) => data(api.get(`/programs/${slugOrId}`)),
-  create: (payload) => data(api.post('/programs', payload)),
-  update: (id, payload) => data(api.put(`/programs/${id}`, payload)),
-  remove: (id) => data(api.delete(`/programs/${id}`)),
+  list: (params) => localApi.listPrograms(params),
+  get: (slugOrId) => localApi.getProgram(slugOrId),
+  create: (payload) => localApi.createProgram(payload),
+  update: (id, payload) => localApi.updateProgram(id, payload),
+  remove: (id) => localApi.removeProgram(id),
 };
 
 export const enquiryService = {
-  submit: (payload) => data(api.post('/enquiries', payload)),
-  list: (params) => data(api.get('/enquiries', { params })),
-  get: (id) => data(api.get(`/enquiries/${id}`)),
-  update: (id, payload) => data(api.put(`/enquiries/${id}`, payload)),
-  remove: (id) => data(api.delete(`/enquiries/${id}`)),
-  exportCsv: (params) => api.get('/enquiries/export', { params, responseType: 'blob' }),
+  submit: (payload) => localApi.submitEnquiry(payload),
+  list: (params) => localApi.listEnquiries(params),
+  get: (id) => localApi.getEnquiry(id),
+  update: (id, payload) => localApi.updateEnquiry(id, payload),
+  remove: (id) => localApi.removeEnquiry(id),
+  exportCsv: (params) => localApi.exportEnquiriesCsv(params),
 };
 
 export const studentService = {
-  list: (params) => data(api.get('/students', { params })),
-  get: (id) => data(api.get(`/students/${id}`)),
-  create: (payload) => data(api.post('/students', payload)),
-  update: (id, payload) => data(api.put(`/students/${id}`, payload)),
-  remove: (id, mode = 'delete') => data(api.delete(`/students/${id}`, { params: { mode } })),
+  list: (params) => localApi.listStudents(params),
+  get: (id) => localApi.getStudent(id),
+  create: (payload) => localApi.createStudent(payload),
+  update: (id, payload) => localApi.updateStudent(id, payload),
+  remove: (id, mode = 'delete') => localApi.removeStudent(id, mode),
 };
 
 export const admissionService = {
-  list: (params) => data(api.get('/admissions', { params })),
-  create: (payload) => data(api.post('/admissions', payload)),
-  update: (id, payload) => data(api.put(`/admissions/${id}`, payload)),
-  remove: (id) => data(api.delete(`/admissions/${id}`)),
+  list: (params) => localApi.listAdmissions(params),
+  create: (payload) => localApi.createAdmission(payload),
+  update: (id, payload) => localApi.updateAdmission(id, payload),
+  remove: (id) => localApi.removeAdmission(id),
 };
 
 export const dashboardService = {
-  stats: () => data(api.get('/dashboard/stats')),
-  analytics: (params) => data(api.get('/dashboard/enquiry-analytics', { params })),
-  activity: (params) => data(api.get('/dashboard/activity', { params })),
+  stats: () => localApi.stats(),
+  analytics: (params) => localApi.analytics(params),
+  activity: (params) => localApi.activity(params),
 };
 
 export const settingsService = {
-  get: () => data(api.get('/settings')),
-  update: (settings) => data(api.put('/settings', { settings })),
+  get: () => localApi.getSettings(),
+  update: (settings) => localApi.updateSettings(settings),
 };
 
 export const userService = {
-  list: () => data(api.get('/users')),
-  create: (payload) => data(api.post('/users', payload)),
-  update: (id, payload) => data(api.put(`/users/${id}`, payload)),
-  remove: (id) => data(api.delete(`/users/${id}`)),
+  list: () => localApi.listUsers(),
+  create: (payload) => localApi.createUser(payload),
+  update: (id, payload) => localApi.updateUser(id, payload),
+  remove: (id) => localApi.removeUser(id),
 };
 
 export const portalService = {
-  overview: () => data(api.get('/portal/overview')),
-  updateProfile: (payload) => data(api.put('/portal/profile', payload)),
+  overview: () => localApi.portalOverview(),
+  updateProfile: (payload) => localApi.updateMyProfile(payload),
 };
 
 export const uploadService = {
-  image: (file, onProgress) => {
-    const form = new FormData();
-    form.append('image', file);
-    return data(
-      api.post('/uploads/image', form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: (e) => onProgress?.(Math.round((e.loaded * 100) / (e.total || 1))),
-      })
-    );
-  },
+  image: (file, onProgress) => localApi.uploadImage(file, onProgress),
 };

@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd norea/frontend && npm install && npm run build",
+  "outputDirectory": "norea/frontend/dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
