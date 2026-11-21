@@ -28,4 +28,8 @@ const start = async () => {
   process.on('unhandledRejection', (r) => console.error('[unhandledRejection]', r));
 };
 
-start();
+if (!process.env.VERCEL) {
+  start();
+}
+
+export default app;
