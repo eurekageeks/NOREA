@@ -74,6 +74,11 @@ app.use(
 
 app.get('/sitemap.xml', sitemap);
 app.get('/robots.txt', robots);
+if (!env.serveFrontend) {
+  app.get('/', (_req, res) =>
+    res.json({ success: true, service: 'NŌRÉA – Learning & Development API', health: '/api/health' })
+  );
+}
 
 app.use('/api', apiLimiter, apiRoutes);
 app.use('/api', notFound);
