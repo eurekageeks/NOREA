@@ -30,6 +30,7 @@ const env = {
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME,
     connectionLimit: Number(process.env.DB_POOL_SIZE) || 10,
+    ...(process.env.DB_SSL === 'true' ? { ssl: { rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false' } } : {}),
   },
   jwt: {
     secret: process.env.JWT_SECRET,
@@ -40,6 +41,7 @@ const env = {
   cookieSecure: process.env.COOKIE_SECURE
     ? process.env.COOKIE_SECURE === 'true'
     : process.env.NODE_ENV === 'production',
+  cookieSameSite: process.env.COOKIE_SAME_SITE || 'lax',
   bcryptRounds: Number(process.env.BCRYPT_ROUNDS) || 12,
   uploadMaxMb: Number(process.env.UPLOAD_MAX_MB) || 3,
   serveFrontend: process.env.SERVE_FRONTEND === 'true',

@@ -1,3 +1,4 @@
+import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -7,7 +8,9 @@ import env from '../config/env.js';
 import ApiError from '../utils/ApiError.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export const UPLOAD_DIR = path.resolve(__dirname, '../../uploads');
+export const UPLOAD_DIR = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'norea-uploads')
+  : path.resolve(__dirname, '../../uploads');
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 const ALLOWED = {

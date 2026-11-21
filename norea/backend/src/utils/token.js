@@ -13,8 +13,8 @@ export const verifyToken = (token) =>
 
 export const cookieOptions = () => ({
   httpOnly: true,
-  secure: env.cookieSecure,
-  sameSite: 'lax',
+  secure: env.cookieSecure || env.cookieSameSite === 'none',
+  sameSite: env.cookieSameSite,
   path: '/',
   maxAge: env.jwt.cookieMaxAgeMs,
 });
