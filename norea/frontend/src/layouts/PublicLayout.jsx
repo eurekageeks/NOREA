@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X, Mail, Phone, MapPin, User, LayoutDashboard, ArrowUpRight } from 'lucide-react';
+import { Menu, X, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
 import Logo from '../components/ui/Logo';
 import Button from '../components/ui/Button';
-import { useAuth } from '../context/AuthContext';
-import { useSettings } from '../context/SettingsContext';
+import { SITE } from '../config/siteConfig';
 
 const NAV = [
   { to: '/', label: 'Home', end: true },
@@ -13,58 +12,35 @@ const NAV = [
   { to: '/programs', label: 'Our Programs' },
   { to: '/why-norea', label: 'Why NŌRÉA' },
   { to: '/contact', label: 'Contact Us' },
-  { to: '/admissions', label: 'Admissions' },
 ];
 
 export default function PublicLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const { user, isAdmin } = useAuth();
-  const { settings } = useSettings();
   const { pathname } = useLocation();
 
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const socials = [
-    ['Instagram', settings.social_instagram],
-    ['Facebook', settings.social_facebook],
-    ['LinkedIn', settings.social_linkedin],
-    ['YouTube', settings.social_youtube],
-    ['X', settings.social_x],
-  ].filter(([, url]) => Boolean(url));
-
-  const year = new Date().getFullYear();
-
   return (
-    <div className="flex min-h-screen flex-col bg-ivory text-charcoal">
-      <header
-        className={`sticky top-0 z-40 transition duration-300 ${
-          scrolled ? 'border-b border-beige/90 bg-ivory/95 shadow-soft backdrop-blur-md' : 'border-b border-transparent bg-ivory/85 backdrop-blur-sm'
-        }`}
-      >
+    <div className="flex min-h-screen flex-col bg-cream text-slate-800">
+      <header className="sticky top-0 z-40 border-b border-indigo-100/80 bg-white/90 backdrop-blur-md">
         <div className="container-x flex h-20 items-center justify-between gap-4">
           <Link to="/" aria-label="NŌRÉA Home">
             <Logo size="md" />
           </Link>
 
-          <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex">
+          <nav aria-label="Primary" className="hidden items-center gap-2 lg:flex">
             {NAV.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.end}
                 className={({ isActive }) =>
-                  `relative py-1 text-[0.84rem] font-medium tracking-wide transition ${
-                    isActive ? 'text-navy after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[1.5px] after:bg-gold' : 'text-navy/70 hover:text-navy'
+                  `rounded-full px-4 py-2 text-sm font-semibold transition ${
+                    isActive
+                      ? 'bg-indigo-50 text-indigo-700'
+                      : 'text-slate-600 hover:bg-slate-100/80 hover:text-indigo-700'
                   }`
                 }
               >
@@ -74,29 +50,16 @@ export default function PublicLayout() {
           </nav>
 
           <div className="hidden items-center gap-2.5 lg:flex">
-            {user ? (
-              <Button to={isAdmin ? '/admin' : '/portal'} variant="primary" size="sm">
-                {isAdmin ? <LayoutDashboard className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
-                {isAdmin ? 'Admin Dashboard' : 'Student Portal'}
-              </Button>
-            ) : (
-              <>
-                <Button to="/login" variant="ghost" size="sm">
-                  Login
-                </Button>
-                <Button to="/admissions" variant="primary" size="sm">
-                  Enquire Now
-                </Button>
-              </>
-            )}
+            <Button to="/admissions" variant="primary" size="sm">
+              Enquire Now <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
           </div>
 
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
             aria-label="Toggle navigation menu"
-            aria-expanded={menuOpen}
-            className="inline-flex rounded-xl border border-beige bg-white p-2.5 text-navy lg:hidden"
+            className="inline-flex rounded-xl border border-indigo-100 bg-indigo-50 p-2.5 text-indigo-700 lg:hidden"
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -108,8 +71,8 @@ export default function PublicLayout() {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.22 }}
-              className="overflow-hidden border-t border-beige bg-ivory lg:hidden"
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden border-t border-indigo-100 bg-white lg:hidden"
             >
               <nav className="container-x flex flex-col gap-1 py-4">
                 {NAV.map((item) => (
@@ -118,29 +81,18 @@ export default function PublicLayout() {
                     to={item.to}
                     end={item.end}
                     className={({ isActive }) =>
-                      `rounded-xl px-4 py-3 text-sm font-medium transition ${
-                        isActive ? 'bg-navy text-ivory' : 'text-navy/80 hover:bg-sand'
+                      `rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                        isActive ? 'bg-indigo-600 text-white' : 'text-slate-700 hover:bg-indigo-50'
                       }`
                     }
                   >
                     {item.label}
                   </NavLink>
                 ))}
-                <div className="mt-3 grid grid-cols-2 gap-2.5 border-t border-beige pt-4">
-                  {user ? (
-                    <Button to={isAdmin ? '/admin' : '/portal'} variant="primary" size="sm" className="col-span-2">
-                      {isAdmin ? 'Admin Dashboard' : 'Student Portal'}
-                    </Button>
-                  ) : (
-                    <>
-                      <Button to="/login" variant="outline" size="sm">
-                        Login
-                      </Button>
-                      <Button to="/admissions" variant="primary" size="sm">
-                        Enquire Now
-                      </Button>
-                    </>
-                  )}
+                <div className="mt-3 pt-3 border-t border-slate-100">
+                  <Button to="/admissions" variant="primary" size="md" className="w-full">
+                    Enquire Now <ArrowRight className="h-4 w-4" />
+                  </Button>
                 </div>
               </nav>
             </motion.div>
@@ -152,21 +104,25 @@ export default function PublicLayout() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-navy-700 bg-navy text-ivory/80">
-        <div className="container-x py-16">
-          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-12">
-            <div className="lg:col-span-4">
+      <footer className="bg-ink text-indigo-100">
+        <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-rose-500 via-amber-400 to-teal-400" />
+        <div className="container-x py-14">
+          <div className="grid gap-10 md:grid-cols-3">
+            <div>
               <Logo variant="light" size="md" />
-              <p className="mt-5 max-w-sm text-sm leading-relaxed text-ivory/70">{settings.footer_about}</p>
-              <p className="mt-5 text-xs font-medium uppercase tracking-[0.28em] text-gold-light">{settings.tagline}</p>
+              <p className="mt-4 max-w-sm text-sm leading-relaxed text-indigo-200/85">
+                A colourful, welcoming learning institute focused on Spoken English, Personality Development,
+                Confidence Building, and Positive Parenting.
+              </p>
+              <p className="mt-4 text-xs font-bold uppercase tracking-[0.26em] text-amber-300">{SITE.tagline}</p>
             </div>
 
-            <div className="lg:col-span-3">
-              <h4 className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-gold-light">Explore</h4>
+            <div>
+              <h4 className="font-sans text-xs font-bold uppercase tracking-[0.22em] text-amber-300">Quick Links</h4>
               <ul className="mt-4 space-y-2.5 text-sm">
-                {NAV.map((item) => (
+                {[...NAV, { to: '/admissions', label: 'Admissions Enquiry' }].map((item) => (
                   <li key={item.to}>
-                    <Link to={item.to} className="transition hover:text-gold-light">
+                    <Link to={item.to} className="text-indigo-200 transition hover:text-white">
                       {item.label}
                     </Link>
                   </li>
@@ -174,86 +130,49 @@ export default function PublicLayout() {
               </ul>
             </div>
 
-            <div className="lg:col-span-2">
-              <h4 className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-gold-light">Portals</h4>
-              <ul className="mt-4 space-y-2.5 text-sm">
-                <li>
-                  <Link to="/login" className="transition hover:text-gold-light">
-                    Student Login
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/register" className="transition hover:text-gold-light">
-                    Student Registration
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/admin/login" className="transition hover:text-gold-light">
-                    Admin Sign In
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div className="lg:col-span-3">
-              <h4 className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-gold-light">Connect</h4>
-              <ul className="mt-4 space-y-3 text-sm text-ivory/75">
-                {settings.contact_address && (
+            <div>
+              <h4 className="font-sans text-xs font-bold uppercase tracking-[0.22em] text-amber-300">Get In Touch</h4>
+              <ul className="mt-4 space-y-3 text-sm text-indigo-200">
+                {SITE.address && (
                   <li className="flex items-start gap-2.5">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-                    <span>{settings.contact_address}</span>
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
+                    <span>{SITE.address}</span>
                   </li>
                 )}
-                {settings.contact_phone && (
+                {SITE.phoneDisplay && (
                   <li className="flex items-center gap-2.5">
-                    <Phone className="h-4 w-4 shrink-0 text-gold" />
-                    <a href={`tel:${settings.contact_phone}`} className="hover:text-gold-light">
-                      {settings.contact_phone}
+                    <Phone className="h-4 w-4 shrink-0 text-amber-300" />
+                    <a href={`tel:${SITE.phoneDisplay}`} className="hover:text-white">
+                      {SITE.phoneDisplay}
                     </a>
                   </li>
                 )}
-                {settings.contact_email && (
+                {SITE.instituteEmail && (
                   <li className="flex items-center gap-2.5">
-                    <Mail className="h-4 w-4 shrink-0 text-gold" />
-                    <a href={`mailto:${settings.contact_email}`} className="hover:text-gold-light">
-                      {settings.contact_email}
+                    <Mail className="h-4 w-4 shrink-0 text-amber-300" />
+                    <a href={`mailto:${SITE.instituteEmail}`} className="hover:text-white">
+                      {SITE.instituteEmail}
                     </a>
                   </li>
                 )}
-                {!settings.contact_address && !settings.contact_phone && !settings.contact_email && (
-                  <li className="text-xs text-ivory/55">
+                {!SITE.address && !SITE.phoneDisplay && !SITE.instituteEmail && (
+                  <li className="text-sm text-indigo-200/80">
                     Have a question?{' '}
-                    <Link to="/contact" className="text-gold-light underline underline-offset-4">
-                      Send us a message
-                    </Link>
-                    .
+                    <Link to="/admissions" className="font-semibold text-amber-300 underline underline-offset-4">
+                      Submit a quick enquiry
+                    </Link>{' '}
+                    for instant WhatsApp &amp; Email updates.
                   </li>
                 )}
               </ul>
-
-              {socials.length > 0 && (
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {socials.map(([label, url]) => (
-                    <a
-                      key={label}
-                      href={url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 rounded-lg border border-ivory/15 px-2.5 py-1 text-xs text-ivory/80 transition hover:border-gold hover:text-gold-light"
-                    >
-                      {label} <ArrowUpRight className="h-3 w-3" />
-                    </a>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
-          <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-ivory/10 pt-6 text-xs text-ivory/50 sm:flex-row">
+          <div className="mt-10 flex flex-col items-center justify-between gap-2 border-t border-white/10 pt-6 text-xs text-indigo-300/80 sm:flex-row">
             <p>
-              © {year} {settings.institute_name} – {settings.institute_category}. {settings.footer_text}
+              © {new Date().getFullYear()} {SITE.name} – {SITE.category}. All rights reserved.
             </p>
-            <p className="tracking-widest uppercase text-gold-light/60">{settings.tagline}</p>
+            <p className="font-semibold uppercase tracking-widest text-amber-300/90">{SITE.tagline}</p>
           </div>
         </div>
       </footer>
