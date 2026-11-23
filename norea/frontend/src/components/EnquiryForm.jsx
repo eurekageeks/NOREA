@@ -61,17 +61,20 @@ export default function EnquiryForm({ defaultProgram = '', title = 'Quick Studen
         ...payload,
         emailStatus: emailRes.status,
         emailProvider: emailRes.provider,
+        emailInfo: emailRes.info,
         whatsappOpened: Boolean(waWindow),
         studentName: form.fullName,
         email: form.email,
         phone: form.phone,
         program: form.program,
       });
-      toast.success(
-        emailRes.status === 'sent'
-          ? 'Enquiry submitted! Email sent & WhatsApp opened.'
-          : 'Enquiry submitted! Click the buttons below to send via WhatsApp & Email.'
-      );
+      if (emailRes.status === 'sent') {
+        toast.success('Enquiry submitted! Email sent & WhatsApp opened.');
+      } else if (emailRes.status === 'pending_activation') {
+        toast('Check your institute email inbox (and Spam) for the one-time FormSubmit activation link!', { duration: 6000 });
+      } else {
+        toast.success('Enquiry submitted! Use the WhatsApp & Email buttons below.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -105,8 +108,16 @@ export default function EnquiryForm({ defaultProgram = '', title = 'Quick Studen
 
         {result.emailStatus === 'sent' && (
           <p className="mt-3 text-xs font-semibold text-emerald-700">
-            ✓ Automatic confirmation email triggered to {result.email}
+            ✓ {result.emailInfo || `Automatic confirmation email triggered to ${result.email}`}
           </p>
+        )}
+        {result.emailStatus === 'pending_activation' && (
+          <p className="mt-3 rounded-xl bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-800 ring-1 ring-amber-200">
+            ⚠ One-time setup needed: {result.emailInfo} (check Inbox &amp; Spam folder for the activation email from FormSubmit).
+          </p>
+        )}
+        {(result.emailStatus === 'manual' || result.emailStatus === 'error') && result.emailInfo && (
+          <p className="mt-3 text-xs text-slate-500">{result.emailInfo}</p>
         )}
 
         <div className="mt-6 border-t border-slate-100 pt-5">

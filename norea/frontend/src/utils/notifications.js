@@ -129,21 +129,33 @@ export async function sendEmailNotification(enquiry, payload) {
         body: JSON.stringify({
           _subject: emailSubject,
           _autoresponse: plainText,
+          _captcha: 'false',
           _template: 'table',
-          Reference: ref,
-          Name: enquiry.fullName,
-          Email: enquiry.email,
-          Mobile: enquiry.phone || '—',
-          Program: enquiry.program || 'General',
-          'Learning Mode': enquiry.learningMode || '—',
-          Message: enquiry.message || '—',
+          name: enquiry.fullName,
+          email: enquiry.email,
+          phone: enquiry.phone || '—',
+          program: enquiry.program || 'General',
+          learning_mode: enquiry.learningMode || '—',
+          message: enquiry.message || '—',
+          reference: ref,
         }),
       });
-      if (res.ok) return { status: 'sent', provider: 'FormSubmit' };
-    } catch {
-      /* fall through */
+      const data = await res.json().catch(() => ({}));
+      const ok = data?.success === true || data?.success === 'true';
+      if (res.ok && ok) {
+        return { status: 'sent', provider: 'FormSubmit', info: `Email sent to ${SITE.instituteEmail} & auto-reply to ${enquiry.email}` };
+      }
+      if (data?.message) {
+        return { status: 'pending_activation', provider: 'FormSubmit', info: data.message };
+      }
+    } catch (err) {
+      return { status: 'error', provider: 'FormSubmit', info: err?.message || 'Network error reaching FormSubmit.' };
     }
   }
 
-  return { status: 'manual', provider: null };
+  return {
+    status: 'manual',
+    provider: null,
+    info: 'No email service env var detected in this build. Use the Send Email button below or configure VITE_INSTITUTE_EMAIL / EmailJS and redeploy.',
+  };
 }
